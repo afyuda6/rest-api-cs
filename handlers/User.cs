@@ -37,6 +37,7 @@ public static class User
                 response.ContentLength64 = buffer.Length;
                 await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
                 response.OutputStream.Close();
+                break;
         }
     }
 
