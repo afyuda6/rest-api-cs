@@ -26,10 +26,17 @@ public static class User
                 break;
             default:
                 response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
-                var buffer = Encoding.UTF8.GetBytes($"Ha?");
+                response.ContentType = "application/json";
+                var errorResponse = new
+                {
+                    status = "Method Not Allowed",
+                    code = 405
+                };
+                var jsonResponse = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+                var buffer = Encoding.UTF8.GetBytes(jsonResponse);
                 response.ContentLength64 = buffer.Length;
                 await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-                break;
+                response.OutputStream.Close();
         }
     }
 
