@@ -88,7 +88,7 @@ public static class User
             {
                 status = "Bad Request",
                 code = 400,
-                message = "Missing 'name' parameter"
+                errors = "Missing 'name' parameter"
             };
             var jsonResponse = System.Text.Json.JsonSerializer.Serialize(errorResponse);
             var buffer = Encoding.UTF8.GetBytes(jsonResponse);
@@ -133,7 +133,7 @@ public static class User
             {
                 status = "Bad Request",
                 code = 400,
-                message = "Missing 'id' or 'name' parameter"
+                errors = "Missing 'id' or 'name' parameter"
             };
             var jsonResponse = System.Text.Json.JsonSerializer.Serialize(errorResponse);
             var buffer = Encoding.UTF8.GetBytes(jsonResponse);
@@ -179,7 +179,7 @@ public static class User
             {
                 status = "Bad Request",
                 code = 400,
-                message = "Missing 'id' parameter"
+                errors = "Missing 'id' parameter"
             };
             var jsonResponse = System.Text.Json.JsonSerializer.Serialize(errorResponse);
             var buffer = Encoding.UTF8.GetBytes(jsonResponse);
