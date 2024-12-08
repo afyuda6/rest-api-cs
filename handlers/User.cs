@@ -77,7 +77,7 @@ public static class User
         string requestBody = await new StreamReader(request.InputStream).ReadToEndAsync();
         var userData = HttpUtility.ParseQueryString(requestBody);
 
-        if (userData["name"] == null)
+        if (string.IsNullOrWhiteSpace(userData["name"]))
         {
             response.StatusCode = (int)HttpStatusCode.BadRequest;
             response.ContentType = "application/json";
@@ -122,7 +122,7 @@ public static class User
         string requestBody = await new StreamReader(request.InputStream).ReadToEndAsync();
         var userData = HttpUtility.ParseQueryString(requestBody);
 
-        if (userData["name"] == null || userData["id"] == null)
+        if (string.IsNullOrWhiteSpace(userData["name"]) || string.IsNullOrWhiteSpace(userData["id"]))
         {
             response.StatusCode = (int)HttpStatusCode.BadRequest;
             response.ContentType = "application/json";
@@ -168,7 +168,7 @@ public static class User
         string requestBody = await new StreamReader(request.InputStream).ReadToEndAsync();
         var userData = HttpUtility.ParseQueryString(requestBody);
 
-        if (userData["id"] == null)
+        if (string.IsNullOrWhiteSpace(userData["id"]))
         {
             response.StatusCode = (int)HttpStatusCode.BadRequest;
             response.ContentType = "application/json";
