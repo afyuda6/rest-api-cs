@@ -2,17 +2,16 @@
 
 class MainClass
 {
-    private static HttpListener _listener;
-    private static string _baseUrl = "http://localhost:6005/";
+    private static HttpListener listener;
+    private static string baseUrl = "http://localhost:6005/";
 
     private static void Main(string[] args)
     {
         Sqlite.InitializeDatabase();
-        _listener = new HttpListener();
-        _listener.Prefixes.Add(_baseUrl);
-        _listener.Start();
+        listener = new HttpListener();
+        listener.Prefixes.Add(baseUrl);
+        listener.Start();
         Task.Run(() => ListenForRequests());
-
         Console.ReadLine();
     }
 
@@ -20,8 +19,7 @@ class MainClass
     {
         while (true)
         {
-            var context = await _listener.GetContextAsync();
-            await User.UserHandler(context.Request, context.Response);
+            await User.UserHandler(listener);
         }
     }
 }

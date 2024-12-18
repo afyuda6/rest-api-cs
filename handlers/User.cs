@@ -168,8 +168,11 @@ public static class User
         }
     }
     
-    public static async Task UserHandler(HttpListenerRequest request, HttpListenerResponse response)
+    public static async Task UserHandler(HttpListener listener)
     {
+        var context = await listener.GetContextAsync();
+        var request = context.Request;
+        var response = context.Response;
         if (request.Url.AbsolutePath.Equals("/users") || request.Url.AbsolutePath.Equals("/users/"))
         {
             switch (request.HttpMethod)
