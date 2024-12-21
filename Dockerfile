@@ -1,20 +1,10 @@
-﻿FROM ubuntu:20.04
+﻿FROM mcr.microsoft.com/dotnet/sdk:9.0
 
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
     sqlite3 \
-    libsqlite3-dev \
-    ca-certificates \
-    curl \
-    libunwind8 \
-    gnupg2 \
-    lsb-release && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
-    curl https://packages.microsoft.com/config/ubuntu/20.04/prod.list > /etc/apt/sources.list.d/microsoft-prod.list && \
-    apt-get update && \
-    apt-get install -y dotnet-sdk-9.0
+    curl && \
+    apt-get clean
 
 WORKDIR /rest-api-cs
 
