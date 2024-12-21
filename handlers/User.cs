@@ -1,11 +1,13 @@
 ﻿using System.Data.SQLite;
 using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Web;
+using Microsoft.AspNetCore.Http;
 
 public static class User
 { 
-    private static async Task HandleReadUsers(HttpListenerResponse response)
+    private static async Task HandleReadUsers(HttpResponse response)
     {
         var users = new List<object>();
         await using (var connection = Sqlite.Connect())
@@ -31,16 +33,15 @@ public static class User
             code = 200,
             data = users
         };
-        var jsonResponse = System.Text.Json.JsonSerializer.Serialize(responseBody);
+        var jsonResponse = JsonSerializer.Serialize(responseBody);
         var buffer = Encoding.UTF8.GetBytes(jsonResponse);
-        response.ContentLength64 = buffer.Length;
-        await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-        response.OutputStream.Close();
+        response.ContentLength = buffer.Length;
+        await response.Body.WriteAsync(buffer, 0, buffer.Length);
     }
 
-    private static async Task HandleCreateUser(HttpListenerRequest request, HttpListenerResponse response)
+    private static async Task HandleCreateUser(HttpRequest request, HttpResponse response)
     {
-        var requestBody = await new StreamReader(request.InputStream).ReadToEndAsync();
+        var requestBody = await new StreamReader(request.Body, Encoding.UTF8).ReadToEndAsync();
         var userData = HttpUtility.ParseQueryString(requestBody);
         if (string.IsNullOrWhiteSpace(userData["name"]))
         {
@@ -52,11 +53,10 @@ public static class User
                 code = 400,
                 errors = "Missing 'name' parameter"
             };
-            var jsonResponse = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+            var jsonResponse = JsonSerializer.Serialize(errorResponse);
             var buffer = Encoding.UTF8.GetBytes(jsonResponse);
-            response.ContentLength64 = buffer.Length;
-            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-            response.OutputStream.Close();
+            response.ContentLength = buffer.Length;
+            await response.Body.WriteAsync(buffer, 0, buffer.Length);
         }
         else
         {
@@ -73,17 +73,16 @@ public static class User
                 status = "Created",
                 code = 201
             };
-            var jsonResponse = System.Text.Json.JsonSerializer.Serialize(responseBody);
+            var jsonResponse = JsonSerializer.Serialize(responseBody);
             var buffer = Encoding.UTF8.GetBytes(jsonResponse);
-            response.ContentLength64 = buffer.Length;
-            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-            response.OutputStream.Close();
+            response.ContentLength = buffer.Length;
+            await response.Body.WriteAsync(buffer, 0, buffer.Length);
         }
     }
 
-    private static async Task HandleUpdateUser(HttpListenerRequest request, HttpListenerResponse response)
+    private static async Task HandleUpdateUser(HttpRequest request, HttpResponse response)
     {
-        var requestBody = await new StreamReader(request.InputStream).ReadToEndAsync();
+        var requestBody = await new StreamReader(request.Body, Encoding.UTF8).ReadToEndAsync();
         var userData = HttpUtility.ParseQueryString(requestBody);
         if (string.IsNullOrWhiteSpace(userData["name"]) || string.IsNullOrWhiteSpace(userData["id"]))
         {
@@ -95,11 +94,10 @@ public static class User
                 code = 400,
                 errors = "Missing 'id' or 'name' parameter"
             };
-            var jsonResponse = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+            var jsonResponse = JsonSerializer.Serialize(errorResponse);
             var buffer = Encoding.UTF8.GetBytes(jsonResponse);
-            response.ContentLength64 = buffer.Length;
-            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-            response.OutputStream.Close();
+            response.ContentLength = buffer.Length;
+            await response.Body.WriteAsync(buffer, 0, buffer.Length);
         }
         else
         {
@@ -117,17 +115,16 @@ public static class User
                 status = "OK",
                 code = 200
             };
-            var jsonResponse = System.Text.Json.JsonSerializer.Serialize(responseBody);
+            var jsonResponse = JsonSerializer.Serialize(responseBody);
             var buffer = Encoding.UTF8.GetBytes(jsonResponse);
-            response.ContentLength64 = buffer.Length;
-            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-            response.OutputStream.Close();
+            response.ContentLength = buffer.Length;
+            await response.Body.WriteAsync(buffer, 0, buffer.Length);
         }
     }
 
-    private static async Task HandleDeleteUser(HttpListenerRequest request, HttpListenerResponse response)
+    private static async Task HandleDeleteUser(HttpRequest request, HttpResponse response)
     {
-        var requestBody = await new StreamReader(request.InputStream).ReadToEndAsync();
+        var requestBody = await new StreamReader(request.Body, Encoding.UTF8).ReadToEndAsync();
         var userData = HttpUtility.ParseQueryString(requestBody);
         if (string.IsNullOrWhiteSpace(userData["id"]))
         {
@@ -139,11 +136,10 @@ public static class User
                 code = 400,
                 errors = "Missing 'id' parameter"
             };
-            var jsonResponse = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+            var jsonResponse = JsonSerializer.Serialize(errorResponse);
             var buffer = Encoding.UTF8.GetBytes(jsonResponse);
-            response.ContentLength64 = buffer.Length;
-            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-            response.OutputStream.Close();
+            response.ContentLength = buffer.Length;
+            await response.Body.WriteAsync(buffer, 0, buffer.Length);
         }
         else
         {
@@ -160,22 +156,20 @@ public static class User
                 status = "OK",
                 code = 200
             };
-            var jsonResponse = System.Text.Json.JsonSerializer.Serialize(responseBody);
+            var jsonResponse = JsonSerializer.Serialize(responseBody);
             var buffer = Encoding.UTF8.GetBytes(jsonResponse);
-            response.ContentLength64 = buffer.Length;
-            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-            response.OutputStream.Close();
+            response.ContentLength = buffer.Length;
+            await response.Body.WriteAsync(buffer, 0, buffer.Length);
         }
     }
     
-    public static async Task UserHandler(HttpListener listener)
+    public static async Task UserHandler(HttpContext context)
     {
-        var context = await listener.GetContextAsync();
         var request = context.Request;
         var response = context.Response;
-        if (request.Url.AbsolutePath.Equals("/users") || request.Url.AbsolutePath.Equals("/users/"))
+        if (request.Path.Equals("/users") || request.Path.Equals("/users/"))
         {
-            switch (request.HttpMethod)
+            switch (request.Method.ToUpper())
             {
                 case "GET":
                     await HandleReadUsers(response);
@@ -197,11 +191,10 @@ public static class User
                         status = "Method Not Allowed",
                         code = 405
                     };
-                    var jsonResponse = System.Text.Json.JsonSerializer.Serialize(errorResponse);
+                    var jsonResponse = JsonSerializer.Serialize(errorResponse);
                     var buffer = Encoding.UTF8.GetBytes(jsonResponse);
-                    response.ContentLength64 = buffer.Length;
-                    await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-                    response.OutputStream.Close();
+                    response.ContentLength = buffer.Length;
+                    await response.Body.WriteAsync(buffer, 0, buffer.Length);
                     break;
             }
         }
@@ -214,11 +207,10 @@ public static class User
                 status = "Not Found",
                 code = 404
             };
-            var jsonResponse = System.Text.Json.JsonSerializer.Serialize(errorResponse);
-            var buffer = System.Text.Encoding.UTF8.GetBytes(jsonResponse);
-            response.ContentLength64 = buffer.Length;
-            await response.OutputStream.WriteAsync(buffer, 0, buffer.Length);
-            response.OutputStream.Close();
+            var jsonResponse = JsonSerializer.Serialize(errorResponse);
+            var buffer = Encoding.UTF8.GetBytes(jsonResponse);
+            response.ContentLength = buffer.Length;
+            await response.Body.WriteAsync(buffer, 0, buffer.Length);
         }
     }
 }
