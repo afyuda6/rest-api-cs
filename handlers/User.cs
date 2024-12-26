@@ -183,6 +183,10 @@ public static class User
                 case "DELETE":
                     await HandleDeleteUser(request, response);
                     break;
+                case "OPTIONS":
+                    response.StatusCode = (int)HttpStatusCode.OK;
+                    response.ContentType = "application/json";
+                    break;
                 default:
                     response.StatusCode = (int)HttpStatusCode.MethodNotAllowed;
                     response.ContentType = "application/json";
