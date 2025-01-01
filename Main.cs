@@ -8,7 +8,7 @@ class MainClass
     private static void Main(string[] args)
     {
         Sqlite.InitializeDatabase();
-        var port = Environment.GetEnvironmentVariable("PORT") ?? "6005";
+        var port = Environment.GetEnvironmentVariable("PORT") ?? "6002";
         Host.CreateDefaultBuilder(args)
             .ConfigureWebHostDefaults(webBuilder =>
             {
