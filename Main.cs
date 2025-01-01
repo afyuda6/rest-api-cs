@@ -25,7 +25,10 @@ class MainClass
                     }).Configure(app =>
                     {
                         app.UseCors("AllowSpecificOrigins");
-                        app.Run(async context => { await User.UserHandler(context); });
+                        app.Run(async context =>
+                        {
+                            await User.UserHandler(context);
+                        });
                     })
                     .UseKestrel()
                     .UseUrls($"http://0.0.0.0:{port}");
