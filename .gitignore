@@ -3,3 +3,4 @@ bin/
 obj/
 rest-api-cs.sln
 rest-api-cs.sln.DotSettings.user
+rest-api-cs.csproj
